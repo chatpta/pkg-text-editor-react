@@ -1,10 +1,10 @@
 import React from 'react';
 import { useEffect } from "react";
-import Button from '@mui/material/Button';
 
 import useLandStyle from "./landStyle";
 import StoreConnectUserReadOnly from "../../../store/storeConnectUserReadOnly";
 import Copyright from "../../../components/Copyright/Copyright";
+import CHEditorComponent from "../../../components/CHEditor/CHEditorComponent";
 
 
 function LandingElement() {
@@ -18,13 +18,7 @@ function LandingElement() {
 
     return (
         <div className={ classes.container }>
-            <h1>CHATPTA</h1>
-            <h2>Canada's own Asian store</h2>
-            <h3>Coming soon...</h3>
-
-            <Button variant="outlined" size="large" className={ classes.button }>
-                Job openings
-            </Button>
+            <CHEditorComponent/>
 
             <Copyright style={ { marginTop: "96px" } }/>
         </div>
