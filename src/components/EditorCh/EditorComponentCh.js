@@ -12,11 +12,30 @@ import './EditorStyle/CHEditor.css';
 import BlockStyleControls from "./EditorComponents/BlockStyleControls";
 import InlineStyleControls from "./EditorComponents/InlineStyleControls";
 
-export default function CHEditorComponent() {
+// Custom overrides for "code" style.
+const styleMap = {
+    CODE: {
+        backgroundColor: 'rgba(0, 0, 0, 0.05)',
+        fontFamily: '"Inconsolata", "Menlo", "Consolas", monospace',
+        fontSize: 16,
+        padding: 2,
+    },
+};
+
+export default function EditorComponentCh() {
 
     const [ state, setState ] = React.useState( () => EditorState.createEmpty() );
 
-    function _handleKeyCommand( command, editorState ) {
+    function getBlockStyle( block ) {
+        switch ( block.getType() ) {
+            case 'blockquote':
+                return 'RichEditor-blockquote';
+            default:
+                return null;
+        }
+    }
+
+    function handleKeyCommand( command, editorState ) {
         const newState = RichUtils.handleKeyCommand( editorState, command );
         if ( newState ) {
             setState( newState );
@@ -25,7 +44,7 @@ export default function CHEditorComponent() {
         return false;
     }
 
-    function _mapKeyToEditorCommand( e ) {
+    function mapKeyToEditorCommand( e ) {
         if ( e.keyCode === 9 /* TAB */ ) {
             const newEditorState = RichUtils.onTab(
                 e,
@@ -40,7 +59,7 @@ export default function CHEditorComponent() {
         return getDefaultKeyBinding( e );
     }
 
-    function _toggleBlockType( blockType ) {
+    function toggleBlockType( blockType ) {
         setState(
             RichUtils.toggleBlockType(
                 state,
@@ -49,7 +68,7 @@ export default function CHEditorComponent() {
         );
     }
 
-    function _toggleInlineStyle( inlineStyle ) {
+    function toggleInlineStyle( inlineStyle ) {
         setState(
             RichUtils.toggleInlineStyle(
                 state,
@@ -61,7 +80,7 @@ export default function CHEditorComponent() {
     // If the user changes block type before entering any text, we can
     // either style the placeholder or hide it. Let's just hide it now.
     let className = 'RichEditor-editor';
-    var contentState = state.getCurrentContent();
+    const contentState = state.getCurrentContent();
     if ( !contentState.hasText() ) {
         if ( contentState.getBlockMap().first().getType() !== 'unstyled' ) {
             className += ' RichEditor-hidePlaceholder';
@@ -79,19 +98,19 @@ export default function CHEditorComponent() {
         <div className="RichEditor-root">
             <BlockStyleControls
                 editorState={ state }
-                onToggle={ _toggleBlockType }
+                onToggle={ toggleBlockType }
             />
             <InlineStyleControls
                 editorState={ state }
-                onToggle={ _toggleInlineStyle }
+                onToggle={ toggleInlineStyle }
             />
             <div className={ className } onClick={ focusEditor }>
                 <Editor
                     blockStyleFn={ getBlockStyle }
                     customStyleMap={ styleMap }
                     editorState={ state }
-                    handleKeyCommand={ _handleKeyCommand }
-                    keyBindingFn={ _mapKeyToEditorCommand }
+                    handleKeyCommand={ handleKeyCommand }
+                    keyBindingFn={ mapKeyToEditorCommand }
                     onChange={ setState }
                     placeholder="Tell a story..."
                     ref={ editor }
@@ -100,23 +119,4 @@ export default function CHEditorComponent() {
             </div>
         </div>
     );
-}
-
-// Custom overrides for "code" style.
-const styleMap = {
-    CODE: {
-        backgroundColor: 'rgba(0, 0, 0, 0.05)',
-        fontFamily: '"Inconsolata", "Menlo", "Consolas", monospace',
-        fontSize: 16,
-        padding: 2,
-    },
-};
-
-function getBlockStyle( block ) {
-    switch ( block.getType() ) {
-        case 'blockquote':
-            return 'RichEditor-blockquote';
-        default:
-            return null;
-    }
 }

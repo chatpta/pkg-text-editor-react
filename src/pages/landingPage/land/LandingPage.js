@@ -4,7 +4,7 @@ import { useEffect } from "react";
 import useLandStyle from "./landStyle";
 import StoreConnectUserReadOnly from "../../../store/storeConnectUserReadOnly";
 import Copyright from "../../../components/Copyright/Copyright";
-import CHEditorComponent from "../../../components/CHEditor/CHEditorComponent";
+import EditorComponentCh from "../../../components/EditorCh/EditorComponentCh";
 
 
 function LandingElement() {
@@ -18,7 +18,7 @@ function LandingElement() {
 
     return (
         <div className={ classes.container }>
-            <CHEditorComponent/>
+            <EditorComponentCh/>
 
             <Copyright style={ { marginTop: "96px" } }/>
         </div>
