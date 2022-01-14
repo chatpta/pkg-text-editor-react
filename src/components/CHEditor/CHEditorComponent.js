@@ -12,99 +12,94 @@ import './EditorStyle/CHEditor.css';
 import BlockStyleControls from "./EditorComponents/BlockStyleControls";
 import InlineStyleControls from "./EditorComponents/InlineStyleControls";
 
-export default class CHEditorComponent extends React.Component {
-    constructor( props ) {
-        super( props );
-        this.state = { editorState: EditorState.createEmpty() };
+export default function CHEditorComponent() {
 
-        this.onChange = ( editorState ) => this.setState( { editorState } );
+    const [ state, setState ] = React.useState( () => EditorState.createEmpty() );
 
-        this.handleKeyCommand = this._handleKeyCommand.bind( this );
-        this.mapKeyToEditorCommand = this._mapKeyToEditorCommand.bind( this );
-        this.toggleBlockType = this._toggleBlockType.bind( this );
-        this.toggleInlineStyle = this._toggleInlineStyle.bind( this );
-    }
-
-    _handleKeyCommand( command, editorState ) {
+    function _handleKeyCommand( command, editorState ) {
         const newState = RichUtils.handleKeyCommand( editorState, command );
         if ( newState ) {
-            this.onChange( newState );
+            setState( newState );
             return true;
         }
         return false;
     }
 
-    _mapKeyToEditorCommand( e ) {
+    function _mapKeyToEditorCommand( e ) {
         if ( e.keyCode === 9 /* TAB */ ) {
             const newEditorState = RichUtils.onTab(
                 e,
-                this.state.editorState,
+                state,
                 4, /* maxDepth */
             );
-            if ( newEditorState !== this.state.editorState ) {
-                this.onChange( newEditorState );
+            if ( newEditorState !== state ) {
+                setState( newEditorState );
             }
             return;
         }
         return getDefaultKeyBinding( e );
     }
 
-    _toggleBlockType( blockType ) {
-        this.onChange(
+    function _toggleBlockType( blockType ) {
+        setState(
             RichUtils.toggleBlockType(
-                this.state.editorState,
+                state,
                 blockType
             )
         );
     }
 
-    _toggleInlineStyle( inlineStyle ) {
-        this.onChange(
+    function _toggleInlineStyle( inlineStyle ) {
+        setState(
             RichUtils.toggleInlineStyle(
-                this.state.editorState,
+                state,
                 inlineStyle
             )
         );
     }
 
-    render() {
-        const { editorState } = this.state;
-
-        // If the user changes block type before entering any text, we can
-        // either style the placeholder or hide it. Let's just hide it now.
-        let className = 'RichEditor-editor';
-        var contentState = editorState.getCurrentContent();
-        if ( !contentState.hasText() ) {
-            if ( contentState.getBlockMap().first().getType() !== 'unstyled' ) {
-                className += ' RichEditor-hidePlaceholder';
-            }
+    // If the user changes block type before entering any text, we can
+    // either style the placeholder or hide it. Let's just hide it now.
+    let className = 'RichEditor-editor';
+    var contentState = state.getCurrentContent();
+    if ( !contentState.hasText() ) {
+        if ( contentState.getBlockMap().first().getType() !== 'unstyled' ) {
+            className += ' RichEditor-hidePlaceholder';
         }
-
-        return (
-            <div className="RichEditor-root">
-                <BlockStyleControls
-                    editorState={ editorState }
-                    onToggle={ this.toggleBlockType }
-                />
-                <InlineStyleControls
-                    editorState={ editorState }
-                    onToggle={ this.toggleInlineStyle }
-                />
-                <div className={ className } onClick={ this.focus }>
-                    <Editor
-                        blockStyleFn={ getBlockStyle }
-                        customStyleMap={ styleMap }
-                        editorState={ editorState }
-                        handleKeyCommand={ this.handleKeyCommand }
-                        keyBindingFn={ this.mapKeyToEditorCommand }
-                        onChange={ this.onChange }
-                        placeholder="Tell a story..."
-                        spellCheck={ true }
-                    />
-                </div>
-            </div>
-        );
     }
+
+    // editor must be declared here so the ref can refer to it
+    let editor = React.createRef();
+
+    function focusEditor() {
+        editor.current.focus();
+    }
+
+    return (
+        <div className="RichEditor-root">
+            <BlockStyleControls
+                editorState={ state }
+                onToggle={ _toggleBlockType }
+            />
+            <InlineStyleControls
+                editorState={ state }
+                onToggle={ _toggleInlineStyle }
+            />
+            <div className={ className } onClick={ focusEditor }>
+                <Editor
+                    blockStyleFn={ getBlockStyle }
+                    customStyleMap={ styleMap }
+                    editorState={ state }
+                    handleKeyCommand={ _handleKeyCommand }
+                    keyBindingFn={ _mapKeyToEditorCommand }
+                    onChange={ setState }
+                    placeholder="Tell a story..."
+                    ref={ editor }
+                    spellCheck={ true }
+                />
+            </div>
+        </div>
+    );
 }
 
 // Custom overrides for "code" style.
