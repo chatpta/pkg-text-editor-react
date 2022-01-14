@@ -10,13 +10,12 @@ import reduxStoreUtility from "@chatpta/redux-store-utility";
 const user = reduxStoreUtility.createReducer( "user" );
 const item = reduxStoreUtility.createReducer( "ITEM" );
 const items = reduxStoreUtility.createReducer( "Items" );
-const editor = reduxStoreUtility.createReducer( "Editor" );
+
 
 const app = combineReducers( {
     user: user.userReducer, // Note the prefix 'user' in userReducer
     item: item.itemReducer,
-    items: items.itemsReducer,
-    editor: editor.editorReducer
+    items: items.itemsReducer
 } );
 
 export default app;
