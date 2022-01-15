@@ -5,12 +5,12 @@
  ******************************************************************************/
 
 import React from 'react';
-import { Editor, RichUtils, getDefaultKeyBinding, EditorState } from 'draft-js';
-import 'babel-polyfill';
+import { Editor, RichUtils, getDefaultKeyBinding } from 'draft-js';
 import 'draft-js/dist/Draft.css';
 import './EditorStyle/CHEditor.css';
 import BlockStyleControls from "./EditorComponents/BlockStyleControls";
 import InlineStyleControls from "./EditorComponents/InlineStyleControls";
+import StoreConnectEditorEdit from "../../store/storeConnectEditorEdit";
 
 // Custom overrides for "code" style.
 const styleMap = {
@@ -22,9 +22,9 @@ const styleMap = {
     },
 };
 
-export default function EditorComponentCh() {
+function EditorComponentCh( props ) {
+    const { state, setState } = props;
 
-    const [ state, setState ] = React.useState( () => EditorState.createEmpty() );
 
     function getBlockStyle( block ) {
         switch ( block.getType() ) {
@@ -88,10 +88,10 @@ export default function EditorComponentCh() {
     }
 
     // editor must be declared here so the ref can refer to it
-    let editor = React.createRef();
+    let editorRef = React.createRef();
 
     function focusEditor() {
-        editor.current.focus();
+        editorRef.current.focus();
     }
 
     return (
@@ -112,11 +112,13 @@ export default function EditorComponentCh() {
                     handleKeyCommand={ handleKeyCommand }
                     keyBindingFn={ mapKeyToEditorCommand }
                     onChange={ setState }
-                    placeholder="Tell a story..."
-                    ref={ editor }
+                    placeholder="About product..."
+                    ref={ editorRef }
                     spellCheck={ true }
                 />
             </div>
         </div>
     );
 }
+
+export default StoreConnectEditorEdit( EditorComponentCh );
